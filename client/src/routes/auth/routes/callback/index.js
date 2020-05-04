@@ -7,6 +7,7 @@ class CallbackContainer extends React.Component {
     const { auth, history } = this.props;
     const { idToken } = await auth.authClient.getAuthorizedData();
 
+
     auth.authClient.setState({ token: idToken });
     history.replace('/');
   }
