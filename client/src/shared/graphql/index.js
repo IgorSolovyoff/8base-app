@@ -1,8 +1,17 @@
 import gql from 'graphql-tag';
 
+export const CURRENT_USER_QUERY = gql`
+  query currentUser {
+    user {
+      id
+    }
+  }
+`;
+
+/* Mutation for adding user with email */
 export const USER_SIGN_UP_MUTATION = gql`
-  mutation UserSignUp($user: UserCreateInput!, $authProfileId: ID) {
-    userSignUpWithToken(user: $user, authProfileId: $authProfileId) {
+  mutation userSignUp($user: UserCreateInput!) {
+    userSignUp(user: $user) {
       id
       email
     }

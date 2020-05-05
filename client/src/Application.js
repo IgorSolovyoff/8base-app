@@ -1,7 +1,6 @@
 import React from 'react';
 import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
 import {AppProvider} from '@8base/react-sdk';
-import {Auth, AUTH_STRATEGIES} from '@8base/auth';
 import {AsyncContent, BoostProvider} from '@8base/boost';
 import {toast, ToastContainer} from 'react-toastify';
 
@@ -9,28 +8,17 @@ import {ProtectedRoute} from 'shared/components';
 import {TOAST_SUCCESS_MESSAGE} from 'shared/constants';
 
 import {ContentPlate, MainPlate, Nav} from './components';
-import {Auth as AuthCallback} from './routes/auth';
+import {AuthCallback} from './routes/auth';
 import {Clients} from "./routes/clients";
 import {Orders} from "./routes/orders";
 import {Products} from "./routes/products";
 import {Client} from "./routes/clientCard";
 import {Order} from "./routes/orderCard";
+import AuthClient from './shared/auth';
 
 const {REACT_APP_8BASE_API_ENDPOINT} = process.env;
 
-const AUTH0_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
-const AUTH0_CLIENT_DOMAIN = 'auth.8base.com';
 
-
-const authClient = Auth.createClient({
-    strategy: AUTH_STRATEGIES.WEB_AUTH0,
-    subscribable: true,
-}, {
-    clientId: AUTH0_CLIENT_ID,
-    domain: AUTH0_CLIENT_DOMAIN,
-    redirectUri: `${window.location.origin}/auth/callback`,
-    logoutRedirectUri: `${window.location.origin}/auth`,
-});
 
 
 class Application extends React.PureComponent {
@@ -85,7 +73,7 @@ class Application extends React.PureComponent {
                 <BoostProvider>
                     <AppProvider
                         uri={REACT_APP_8BASE_API_ENDPOINT}
-                        authClient={authClient}
+                        authClient={AuthClient}
                         onRequestSuccess={this.onRequestSuccess}
                         onRequestError={this.onRequestError}
                     >

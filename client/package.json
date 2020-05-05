@@ -31,6 +31,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@8base/api-client": "^1.2.5",
     "babel-eslint": "^10.0.3",
     "cross-env": "^6.0.0",
     "eslint": "6.4.0",

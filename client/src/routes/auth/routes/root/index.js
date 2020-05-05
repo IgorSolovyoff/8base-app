@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { Loader } from '@8base/boost';
 import { withAuth } from '@8base/app-provider';
 
 class AuthContainer extends React.Component {
@@ -10,9 +10,7 @@ class AuthContainer extends React.Component {
   }
 
   render() {
-    return (
-      <Loader stretch />
-    );
+    return <h2>Loading...</h2>;
   }
 }
 
