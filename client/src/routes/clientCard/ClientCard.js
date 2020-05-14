@@ -4,6 +4,7 @@ import {Card, Paper, Paragraph, TableBuilder, Text} from '@8base/boost';
 import {Query, withApollo} from 'react-apollo';
 import gql from "graphql-tag";
 import * as R from "ramda";
+import {Redirect} from "react-router-dom"
 
 
 const CLIENT_TABLE_COLUMNS = [
@@ -79,6 +80,10 @@ class ClientCard extends React.Component {
 
     renderContent = ({data, loading}) => {
         const {tableState, onChange} = this.props;
+
+        if (!!data && data.client === null) {
+            return <Redirect to="/clients"/>
+        }
 
 
         const tableData = R.pathOr([], ['client', 'orders', 'items'], data);

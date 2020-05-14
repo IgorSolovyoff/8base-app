@@ -12,7 +12,7 @@ class OrderDeleteDialog extends React.Component {
     static contextType = ModalContext;
 
     createOnSubmit = (id) => async () => {
-        await this.props.orderItemDelete({ variables: { id }});
+        await this.props.orderDelete({ variables: { id }});
 
         this.context.closeModal(ORDER_DELETE_DIALOG_ID);
     };
@@ -23,7 +23,7 @@ class OrderDeleteDialog extends React.Component {
 
     renderFormContent = ({ handleSubmit, invalid, submitting }) => (
         <form onSubmit={ handleSubmit }>
-            <Dialog.Header title="Delete Order Item" onClose={ this.onClose } />
+            <Dialog.Header title="Delete Order" onClose={ this.onClose } />
             <Dialog.Body scrollable>
                 Are you really want to delete order?
             </Dialog.Body>
@@ -52,9 +52,9 @@ class OrderDeleteDialog extends React.Component {
 }
 
 OrderDeleteDialog = graphql(sharedGraphQL.ORDER_DELETE_MUTATION, {
-    name: 'orderItemDelete',
+    name: 'orderDelete',
     options: {
-        refetchQueries: ['OrderItems'],
+        refetchQueries: ['Orders'],
         context: {
             [TOAST_SUCCESS_MESSAGE]: 'Order item successfully deleted'
         },

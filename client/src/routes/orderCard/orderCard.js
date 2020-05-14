@@ -4,6 +4,7 @@ import {Card, Paragraph, TableBuilder, Text} from '@8base/boost';
 import {Query, withApollo} from 'react-apollo';
 import gql from "graphql-tag";
 import * as R from "ramda";
+import {Redirect} from "react-router-dom"
 
 
 const ORDER_TABLE_COLUMNS = [
@@ -57,12 +58,17 @@ class OrderCard extends React.Component {
         const {tableState, onChange} = this.props;
 
 
+        if (!!data && data.order === null) {
+            return <Redirect to="/orders" />
+        }
+
+
         const tableData = R.pathOr([], ['order', 'orderItems', 'items'], data);
         const total = R.pathOr(null, ['order', 'orderItems', 'count'], data);
         const finalTableState = R.assocPath(['pagination', 'total'], total, tableState);
 
         return (
-            <Card.Body>
+             <Card.Body>
                 <Card.Section>
                     <Paragraph color="PRIMARY_TEXT_COLOR"><Text
                         weight="bold">Id:</Text> {R.pathOr('No Id', ['order', 'id'], data)}</Paragraph>

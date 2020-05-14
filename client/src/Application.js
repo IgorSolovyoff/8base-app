@@ -10,11 +10,11 @@ import {TOAST_SUCCESS_MESSAGE} from 'shared/constants';
 import {ContentPlate, MainPlate, Nav} from './components';
 import {AuthCallback} from './routes/auth';
 import {Clients} from "./routes/clients";
-import {Orders} from "./routes/orders";
 import {Products} from "./routes/products";
 import {Client} from "./routes/clientCard";
 import {Order} from "./routes/orderCard";
 import AuthClient from './shared/auth';
+import {Orders} from "./routes/orders";
 
 const {REACT_APP_8BASE_API_ENDPOINT} = process.env;
 

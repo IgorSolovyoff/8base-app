@@ -8,7 +8,7 @@ export const CURRENT_USER_QUERY = gql`
   }
 `;
 
-/* Mutation for adding user with email */
+
 export const USER_SIGN_UP_MUTATION = gql`
   mutation userSignUp($user: UserCreateInput!) {
     userSignUp(user: $user) {
@@ -116,10 +116,35 @@ export const ORDERS_LIST_QUERY = gql`
           address,
           deliveryDt,
           comment,
-          status
+          status,
+          orderItems {
+            items {
+              product {
+                name,
+                price
+              }
+              quantity
+            }
+          }
         }
       }
     }
+`;
+
+export const ORDER_CREATE_MUTATION = gql`
+  mutation OrderCreate($data: OrderCreateInput!) {
+    orderCreate(data: $data) {
+      id
+    }
+  }
+`;
+
+export const ORDER_DELETE_MUTATION = gql`
+  mutation OrderDelete($id: ID!) {
+    orderDelete(data: { id: $id }) {
+      success
+    }
+  }
 `;
 
 export const ORDER_ITEMS_LIST_QUERY = gql`
@@ -141,7 +166,7 @@ export const ORDER_ITEMS_LIST_QUERY = gql`
   }
 `;
 
-export const ORDER_CREATE_MUTATION = gql`
+export const ORDER_ITEM_CREATE_MUTATION = gql`
   mutation OrderItemCreate($data: OrderItemCreateInput!) {
     orderItemCreate(data: $data) {
       id
@@ -149,7 +174,7 @@ export const ORDER_CREATE_MUTATION = gql`
   }
 `;
 
-export const ORDER_DELETE_MUTATION = gql`
+export const ORDER_ITEMS_DELETE_MUTATION = gql`
   mutation OrderItemDelete($id: ID!) {
     orderItemDelete(data: { id: $id }) {
       success
