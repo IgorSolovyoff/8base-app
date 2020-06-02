@@ -28,7 +28,7 @@ class Application extends React.PureComponent {
                 <Route path="/auth" component={AuthCallback}/>
                 <Route>
                     <MainPlate>
-                        <Nav.Plate color="GREEN">
+                        <Nav.Plate color="BLUE">
                             <Nav.Item icon="Group" to="/clients" label="Clients"/>
                             <Nav.Item icon="Table" to="/orders" label="Orders"/>
                             <Nav.Item icon="Screens" to="/products" label="Products"/>
@@ -74,6 +74,7 @@ class Application extends React.PureComponent {
                     <AppProvider
                         uri={REACT_APP_8BASE_API_ENDPOINT}
                         authClient={AuthClient}
+                        withSubscriptions={true}
                         onRequestSuccess={this.onRequestSuccess}
                         onRequestError={this.onRequestError}
                     >

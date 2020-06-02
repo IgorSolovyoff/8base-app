@@ -4,6 +4,7 @@ import { Card, Heading } from '@8base/boost';
 import { OrdersTable } from './OrdersTable';
 import {OrderCreateDialog} from "./OrderCreateDialog";
 import {OrderDeleteDialog} from "./OrderDeleteDialog";
+import {OrderChanged} from "./OrderChanged";
 
 const Orders = () => (
     <Card padding="md" stretch>
@@ -17,6 +18,10 @@ const Orders = () => (
         <Card.Body padding="none" stretch scrollable>
             <OrdersTable />
         </Card.Body>
+        <Card.Footer>
+            <OrderChanged/>
+        </Card.Footer>
+
     </Card>
 );
 
