@@ -41,7 +41,7 @@ export const OrderChanged = () => {
 
     const [orderUpdate] = useMutation(ORDER_MUTATION);
 
-    const generateRandomComment = () => {
+    const generateRandomComment = async () => {
         orderUpdate({
             variables: {
                 data: {
@@ -56,7 +56,9 @@ export const OrderChanged = () => {
     };
 
     const subscription = useSubscription(ORDERS_UPDATE_SUBSCRIPTION);
+
     console.log(subscription);
+    console.log(orderData);
 
 
     return (

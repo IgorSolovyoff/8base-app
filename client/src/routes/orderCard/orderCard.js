@@ -1,10 +1,10 @@
 import React from 'react';
-import {compose} from 'recompose';
-import {Card, Paragraph, TableBuilder, Text} from '@8base/boost';
-import {Query, withApollo} from 'react-apollo';
+import {Button, Card, Paragraph, TableBuilder, Text} from '@8base/boost';
+import {useMutation, useQuery, useSubscription} from 'react-apollo';
 import gql from "graphql-tag";
 import * as R from "ramda";
 import {Redirect} from "react-router-dom"
+import debounce from 'lodash.debounce';
 
 
 const ORDER_TABLE_COLUMNS = [
@@ -12,11 +12,35 @@ const ORDER_TABLE_COLUMNS = [
     {name: 'quantity', title: 'quantity'}
 ];
 
+const ORDER_MUTATION = gql`
+mutation OrderCommentUpdate($data: OrderUpdateInput!, $filter: OrderKeyFilter!) {
+  orderUpdate(filter: $filter, data: $data)  {
+    comment
+  }
+}
+`;
 
-class OrderCard extends React.Component {
-    ORDER_QUERY = gql`
+
+const ORDER_SUBSCRIPTION = gql`
+    subscription ordersUpdate {
+      Orders {
+        mutation
+        node {
+          id
+          client {
+            firstName
+          }
+        }
+      }
+    }
+`;
+
+export const OrderCard = (props) => {
+
+
+    const ORDER_QUERY = gql`
         query Order {
-          order(id: "${this.props.id}") {
+          order(id: "${props.id}") {
             id,
             client {
               firstName
@@ -36,7 +60,30 @@ class OrderCard extends React.Component {
           }
         }
       `;
-    renderCell = (column, order) => {
+
+
+    const {loading, data: orderItemData, refetch} = useQuery(ORDER_QUERY);
+    const [orderUpdate] = useMutation(ORDER_MUTATION);
+
+    // const debouncedRefetch = React.useMemo(
+    //     () =>
+    //         debounce(() => {
+    //             console.log("refetch");
+    //             refetch();
+    //         }, 5000),
+    //     [refetch],
+    // );
+    //
+    // const onSubscriptionData = React.useCallback(() => {
+    //     debouncedRefetch();
+    // }, [debouncedRefetch]);
+
+    const subscription = useSubscription(ORDER_SUBSCRIPTION);
+
+    console.log(subscription);
+
+
+    const renderCell = (column, order) => {
 
         let rendered = String(order[column.name]);
 
@@ -54,72 +101,81 @@ class OrderCard extends React.Component {
         return rendered;
     };
 
-    renderContent = ({data, loading}) => {
-        const {tableState, onChange} = this.props;
+    const generateRandomComment = async () => {
+        orderUpdate({
+            variables: {
+                data: {
+                    comment: `${Math.random()}`
+                },
+                filter: {
+                    id: orderItemData.order.id
+                }
 
-
-        if (!!data && data.order === null) {
-            return <Redirect to="/orders" />
-        }
-
-
-        const tableData = R.pathOr([], ['order', 'orderItems', 'items'], data);
-        const total = R.pathOr(null, ['order', 'orderItems', 'count'], data);
-        const finalTableState = R.assocPath(['pagination', 'total'], total, tableState);
-
-        return (
-             <Card.Body>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text
-                        weight="bold">Id:</Text> {R.pathOr('No Id', ['order', 'id'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text weight="bold">First
-                        Name: </Text> {R.pathOr('No First Name', ['order', 'client', 'firstName'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text
-                        weight="bold">Address: </Text> {R.pathOr('No Address', ['order', 'address'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text weight="bold">Delivery
-                        Dt: </Text> {R.pathOr('No Delivery Dt', ['order', 'deliveryDt'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text
-                        weight="bold">Comment: </Text> {R.pathOr('No Comment', ['order', 'comment'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Paragraph color="PRIMARY_TEXT_COLOR"><Text
-                        weight="bold">Status: </Text> {R.pathOr('No Status', ['order', 'status'], data)}</Paragraph>
-                </Card.Section>
-                <Card.Section>
-                    <Text weight="bold">Order items:</Text>
-                    <br/>
-                    <br/>
-                    <TableBuilder
-                        columns={ORDER_TABLE_COLUMNS}
-                        data={tableData}
-                        loading={loading}
-                        tableState={finalTableState}
-                        onChange={onChange}
-                        renderCell={this.renderCell}
-                        withPagination
-                    />
-                </Card.Section>
-            </Card.Body>
-        );
+            }
+        })
     };
 
-    render() {
-        return <Query query={this.ORDER_QUERY}>{this.renderContent}</Query>
+
+    const {tableState, onChange} = props;
+
+
+    if (!!orderItemData && orderItemData.order === null) {
+        return <Redirect to="/orders"/>
     }
-}
 
 
-OrderCard = compose(
-    withApollo,
-)(OrderCard);
+    const tableData = R.pathOr([], ['order', 'orderItems', 'items'], orderItemData);
+    const total = R.pathOr(null, ['order', 'orderItems', 'count'], orderItemData);
+    const finalTableState = R.assocPath(['pagination', 'total'], total, tableState);
 
-
-export {OrderCard};
+    return (
+        <Card.Body>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text
+                    weight="bold">Id:</Text> {R.pathOr('No Id', ['order', 'id'], orderItemData)}</Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text weight="bold">First
+                    Name: </Text> {R.pathOr('No First Name', ['order', 'client', 'firstName'], orderItemData)}
+                </Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text
+                    weight="bold">Address: </Text> {R.pathOr('No Address', ['order', 'address'], orderItemData)}
+                </Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text weight="bold">Delivery
+                    Dt: </Text> {R.pathOr('No Delivery Dt', ['order', 'deliveryDt'], orderItemData)}</Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text
+                    weight="bold">Comment: </Text> {R.pathOr('No Comment', ['order', 'comment'], orderItemData)}
+                </Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Paragraph color="PRIMARY_TEXT_COLOR"><Text
+                    weight="bold">Status: </Text> {R.pathOr('No Status', ['order', 'status'], orderItemData)}
+                </Paragraph>
+            </Card.Section>
+            <Card.Section>
+                <Text weight="bold">Order items:</Text>
+                <br/>
+                <br/>
+                <TableBuilder
+                    columns={ORDER_TABLE_COLUMNS}
+                    data={tableData}
+                    loading={loading}
+                    tableState={finalTableState}
+                    onChange={onChange}
+                    renderCell={renderCell}
+                    withPagination
+                />
+            </Card.Section>
+            <Card.Section>
+                <p>Your comment: {!loading ? orderItemData.order.comment : "Loading..."}</p>
+                <Button onClick={generateRandomComment}>Set Random comment</Button>
+            </Card.Section>
+        </Card.Body>
+    )
+};
